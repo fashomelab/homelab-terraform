@@ -1,0 +1,37 @@
+# /bootstrap/bootstrap.tfvars.example
+#
+# Template for bootstrapping the Azure remote backend infrastructure.
+#
+# INSTRUCTIONS:
+# 1. Copy this file to 'bootstrap.tfvars'.
+# 2. Replace the example values with your own.
+# 3. Run 'terraform apply -var-file="bootstrap.tfvars"' from the /bootstrap directory.
+#------------------------------------------------------------------------------------
+
+# --- Naming Convention Components ---
+# These variables are used to construct a predictable and unique name for your resources,
+# e.g., "examplecorpstoredevwest" for a storage account.
+
+company_abbr = "excorp" # A short (3-6 character) abbreviation for your project or company.
+environment  = "dev"    # The environment name (e.g., dev, prod, test).
+region_abbr  = "west"   # A short, lowercase abbreviation for your Azure region (e.g., west, east, north).
+
+# --- Azure Resource Settings ---
+location = "westus" # The full name of the Azure region. Must match the region_abbr.
+
+# --- Storage Account Settings ---
+account_tier             = "Standard"         # The performance tier for the storage account (e.g., Standard, Premium).
+account_replication_type = "LRS"              # The replication type (e.g., LRS, GRS, ZRS).
+network_rules_ip_rules   = ["0.0.0.0"]        # Your public IP or CIDR block (replace with your actual IP).
+container_names = [
+  "terraform-state-primary",
+  "terraform-state-secondary"
+]
+
+# --- Resource Tagging ---
+# These tags will be applied to all resources created by this configuration.
+common_tags = {
+  Environment = "example-env"
+  Purpose     = "Terraform-State-Management"
+  Owner       = "automation-team"
+}

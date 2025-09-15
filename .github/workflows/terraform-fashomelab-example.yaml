@@ -1,0 +1,113 @@
+# This is an example workflow file. To use it, remove the '.example' suffix and
+# replace the placeholder values (like 'your-vault-url' and 'your-runner-tag')
+# with your own configuration.
+
+name: Terraform CI - Fashomelab Example
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'labsterraform/environments/fashomelab/**'
+      - 'labsterraform/modules/**'
+      - '.github/workflows/terraform-fashomelab.yaml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'labsterraform/environments/fashomelab/**'
+      - 'labsterraform/modules/**'
+      - '.github/workflows/terraform-fashomelab.yaml'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  validate-and-plan:
+    # Runners on public repos should be ephemeral and secure.
+    # Replace 'your-runner-tag' with the label for your self-hosted runners.
+    runs-on: your-runner-tag
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./labsterraform/environments/fashomelab
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Run TruffleHog Secrets Scan
+      uses: trufflesecurity/trufflehog@v3.90.6
+      with:
+        path: .
+        extra_args: --only-verified
+
+    - name: Install TFLint
+      run: |
+        curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+        tflint --version
+
+    - name: Run TFLint
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        tflint --init --config=${{ github.workspace }}/labsterraform/.tflint.hcl
+        tflint --config=${{ github.workspace }}/labsterraform/.tflint.hcl
+
+    - name: Import Secrets from HashiCorp Vault
+      uses: hashicorp/vault-action@v3
+      with:
+        # Replace with the URL of your Vault server
+        url: https://your-vault-url.com
+        # Replace with the name of your JWT role in Vault
+        role: your-ci-cd-role
+        method: jwt
+        jwtGithubAudience: https://your-vault-url.com
+        secrets: |
+          # These paths are examples. Replace with your own KV secret paths in Vault.
+          # Azure credentials for the backend
+          kv/data/example-corp/prod/azure ARM_CLIENT_ID | ARM_CLIENT_ID;
+          kv/data/example-corp/prod/azure ARM_TENANT_ID | ARM_TENANT_ID;
+          kv/data/example-corp/prod/azure ARM_SUBSCRIPTION_ID | ARM_SUBSCRIPTION_ID;
+          # Proxmox credentials
+          kv/data/example-corp/onprem/proxmox PROXMOX_API_TOKEN | TF_VAR_api_token;
+          kv/data/example-corp/onprem/proxmox PROXMOX_USER | TF_VAR_proxmoxuser;
+          kv/data/example-corp/onprem/proxmox PROXMOX_VIRTUAL_ENVIRONMENT_ENDPOINT | TF_VAR_virtual_environment_endpoint;
+          # Proxmox configuration
+          kv/data/example-corp/onprem/config node_primary_name | TF_VAR_proxmox_node_primary_name;
+          kv/data/example-corp/onprem/config node_primary_address | TF_VAR_proxmox_node_primary_address;
+          # SSH keys
+          kv/data/example-corp/onprem/keys ci_cd_public_key | TF_VAR_ci_cd_public_key;
+          kv/data/example-corp/onprem/keys user_public_key | TF_VAR_user_public_key;
+          kv/data/example-corp/onprem/keys ci_cd_private_key | CI_CD_PRIVATE_KEY
+        exportEnv: true
+
+    - name: Install Azure CLI
+      run: |
+        echo "Installing Azure CLI..."
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+        az --version
+
+    - name: Azure Login using OIDC
+      uses: azure/login@v1
+      with:
+        client-id: ${{ env.ARM_CLIENT_ID }}
+        tenant-id: ${{ env.ARM_TENANT_ID }}
+        subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.13.1
+
+    - name: Terraform Init
+      run: terraform init -no-color
+
+    - name: Terraform Validate
+      run: terraform validate -no-color
+
+    - name: Terraform Plan
+      run: terraform plan -no-color -out=tfplan -var-file="fashomelab.tfvars"

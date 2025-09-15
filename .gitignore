@@ -1,0 +1,73 @@
+# .gitignore
+
+# Terraform Files
+# -----------------------------------------------------------------------------
+# Ignore local Terraform state files. Remote state is used.
+*.tfstate
+*.tfstate.*
+
+# Ignore local .terraform directories containing providers and modules.
+# Also ignore .lock.hcl
+.terraform/
+**/.terraform/ # Be explicit for all subdirectories
+*.lock.hcl
+
+# Ignore plan files. These can contain sensitive data and are environment-specific.
+*.tfplan
+
+# Ignore crash logs
+crash.log
+terraform.log
+
+# Terraform Cloud/Enterprise credentials
+.terraformrc
+terraform.rc
+
+
+# Variable Files & Secrets
+# -----------------------------------------------------------------------------
+# Ignore all .tfvars files as they contain environment-specific values or secrets.
+# Common practice is to use a .tfvars.example or similar file as a template.
+*.tfvars
+*.tfvars.json
+*.tfvars.bak
+
+# Ignore sensitive files that might be generated.
+*.pem
+*.ppk
+*.secret
+*.credentials
+.env
+
+
+# Terragrunt
+# -----------------------------------------------------------------------------
+# Ignore the Terragrunt cache directory.
+.terragrunt-cache/
+**/.terragrunt-cache/
+
+
+# Local Overrides & Configuration
+# -----------------------------------------------------------------------------
+# Ignore override files, which are meant for local testing only.
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore custom JSON files if they contain generated or sensitive data.
+vms_config.json
+
+
+# IDE & Editor Directories
+# -----------------------------------------------------------------------------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+
+# OS-generated files
+# -----------------------------------------------------------------------------
+.DS_Store
+Thumbs.db

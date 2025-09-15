@@ -1,0 +1,32 @@
+# /labsterraform/environments/examplehomelab/vms.yaml.example
+#
+# This file defines the inventory of virtual machines to be created by Terraform.
+# It is read by main.tf using the yamldecode() function.
+#
+# INSTRUCTIONS:
+# 1. Copy this file to 'vms.yaml'.
+# 2. Replace the example values with your own.
+# 3. Run 'terraform apply' from the /environments/examplehomelab directory.
+#------------------------------------------------------------------------------------
+
+primary-vm:
+  vm_id: 100
+  node_name: "node1"
+  core_count: 4
+  memory: 4096
+  datastore: "local-storage"
+  guestagent: "true"
+  bridge: "vmbr0"
+  vlanid: 100
+  tags: ["dev", "control-plane"]
+
+secondary-vm:
+  vm_id: 101
+  node_name: "node2"
+  core_count: 2
+  memory: 2048
+  datastore: "local-storage"
+  guestagent: "true"
+  bridge: "vmbr0"
+  vlanid: 100
+  tags: ["dev"]
