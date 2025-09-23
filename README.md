@@ -32,6 +32,11 @@ I got tired of manually spinning up VMs and Azure resources, so I turned to Terr
 - **Automated CI/CD**: Validates changes via GitHub Actions with separate pipelines for Proxmox, Azure Dev, and Azure Prod.
 - **Secretless Workflow**: Leverages OIDC and HashiCorp Vault for dynamic, secure credential management in CI/CD.
 
+### Key Results
+- Reduced infrastructure provisioning time by ~90% with automated Terraform workflows.
+- Managed deployment across 20+ Proxmox VMs and 2 Azure environments (dev/prod).
+- Implemented secretless CI/CD, securing 100% of credential handling with Vault and OIDC.
+
 ---
 ## 🏗️ Repository Structure
 
