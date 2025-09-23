@@ -1,18 +1,10 @@
 # Homelab Infrastructure as Code (Terraform)
 
-<table>
-  <tr>
-    <td>
-      <img src="https://img.shields.io/badge/Proxmox-CI%20Passing-brightgreen" alt="FasHomeLab CI">
-    </td>
-    <td>
-      <img src="https://img.shields.io/badge/Azure%20Prod-CI%20Passing-brightgreen" alt="AzHomelab Prod CI">
-    </td>
-    <td>
-      <img src="https://img.shields.io/badge/Azure%20Dev-CI%20Passing-brightgreen" alt="AzHomelab Dev CI">
-    </td>
-  </tr>
-</table>
+<div align="center">
+  <img src="https://img.shields.io/badge/Proxmox-CI%20Passing-brightgreen" alt="FasHomeLab CI">
+  <img src="https://img.shields.io/badge/Azure%20Prod-CI%20Passing-brightgreen" alt="AzHomelab Prod CI">
+  <img src="https://img.shields.io/badge/Azure%20Dev-CI%20Passing-brightgreen" alt="AzHomelab Dev CI">
+</div>
 
 This repository powers the infrastructure layer of my [FasHomeLab project](https://github.com/fashomelab/corneb), a hybrid homelab inspired by the automation of Horizon’s Faro Automated Solutions. What began as a single Proxmox server has grown into a fully declarative setup managing VMs on Proxmox and resources in Azure. This is my DevOps sandbox, where I experiment with Terraform to build scalable, secure infrastructure—paired with my [Ansible repo](https://github.com/fashomelab/ansible) for configuration.
 
