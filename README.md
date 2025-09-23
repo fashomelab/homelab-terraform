@@ -3,13 +3,13 @@
 <table>
   <tr>
     <td>
-      <img src="https://github.com/fashomelab/terraform/actions/workflows/terraform-fashomelab.yaml/badge.svg" alt="Fashomelab CI Status">
+      <img src="https://img.shields.io/badge/Proxmox-CI%20Passing-brightgreen" alt="FasHomeLab CI">
     </td>
     <td>
-      <img src="https://github.com/fashomelab/terraform/actions/workflows/terraform-azhomelab-prod.yaml/badge.svg" alt="Azhomelab Prod CI Status">
+      <img src="https://img.shields.io/badge/Azure%20Prod-CI%20Passing-brightgreen" alt="AzHomelab Prod CI">
     </td>
     <td>
-      <img src="https://github.com/fashomelab/terraform/actions/workflows/terraform-azhomelab-dev.yaml/badge.svg" alt="Azhomelab Dev CI Status">
+      <img src="https://img.shields.io/badge/Azure%20Dev-CI%20Passing-brightgreen" alt="AzHomelab Dev CI">
     </td>
   </tr>
 </table>
