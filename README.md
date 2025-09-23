@@ -14,18 +14,23 @@
   </tr>
 </table>
 
-This repository contains the complete Terraform code used to declaratively manage my hybrid homelab infrastructure, from on-premise Proxmox VMs to a multi-environment setup in Microsoft Azure.
-
-This is the "Infrastructure as Code" component of my main portfolio project, [Project FasHomeLab](https://github.com/fashomelab/corneb).
+This repository powers the infrastructure layer of my [FasHomeLab project](https://github.com/fashomelab/corneb), a hybrid homelab inspired by the automation of Horizon’s Faro Automated Solutions. What began as a single Proxmox server has grown into a fully declarative setup managing VMs on Proxmox and resources in Azure. This is my DevOps sandbox, where I experiment with Terraform to build scalable, secure infrastructure—paired with my [Ansible repo](https://github.com/fashomelab/ansible) for configuration.
 
 ---
+
+## 🌟 Why This Repo?
+
+I got tired of manually spinning up VMs and Azure resources, so I turned to Terraform to make my homelab infrastructure repeatable and version-controlled. This repo automates provisioning for my Proxmox cluster and Azure environments, saving me hours of setup time and ensuring consistency. It’s a core part of my [FasHomeLab portfolio](https://github.com/fashomelab/corneb), showcasing IaC skills in a real-world setup. Want to build your own hybrid-cloud lab? Fork this, tweak the vars, and deploy your infrastructure!
+
+---
+
 ## 🚀 Key Features
 
-* **Hybrid-Cloud Management:** Manages resources across on-premise Proxmox (`fashomelab`) and multi-environment Microsoft Azure (`azhomelab/prod`, `azhomelab/dev`) setups.
-* **Modular by Design:** Promotes code reuse and maintainability by defining all resources in dedicated, configurable modules.
-* **Secure Remote Backend:** Includes a bootstrap process to create a secure, isolated Azure Storage Account for managing Terraform state.
-* **Automated CI/CD Validation:** All code changes are automatically validated through separate GitHub Actions pipelines for each environment, ensuring safety and stability.
-* **Dynamic Secrets Management:** The CI/CD pipelines are completely secretless. They authenticate to Azure using **OIDC** and pull all other credentials dynamically from **HashiCorp Vault** at runtime.
+- **Hybrid-Cloud Management**: Provisions resources across on-premise Proxmox (`fashomelab`) and Azure (`azhomelab/dev`, `azhomelab/prod`) environments.
+- **Modular Design**: Uses reusable modules (e.g., VMs, databases) for maintainability and scalability.
+- **Secure Remote Backend**: Bootstraps an Azure Storage Account for safe Terraform state storage.
+- **Automated CI/CD**: Validates changes via GitHub Actions with separate pipelines for Proxmox, Azure Dev, and Azure Prod.
+- **Secretless Workflow**: Leverages OIDC and HashiCorp Vault for dynamic, secure credential management in CI/CD.
 
 ---
 ## 🏗️ Repository Structure
@@ -116,3 +121,11 @@ Next, configure one of the main environments (e.g., `azhomelab/prod`).
 2.  Update the `backend.tf` file with the resource names from the bootstrap step.
 3.  Create a `.tfvars` file (e.g., `prod.tfvars`) from the provided `.tfvars.example` and populate it with your desired infrastructure settings.
 4.  Run `terraform plan` and `terraform apply`.
+
+---
+## 🤝 Contributing
+Contributions are welcome! Fork the repo, customize modules or vars, or submit PRs to enhance Proxmox/Azure support. Check issues for ideas.
+
+---
+## 📜 License
+This project is licensed under the MIT License. See the [LICENSE.md](LICENSE.md) file for details.
