@@ -25,8 +25,9 @@ I got tired of manually spinning up VMs and Azure resources, so I turned to Terr
 - **Secretless Workflow**: Leverages OIDC and HashiCorp Vault for dynamic, secure credential management in CI/CD.
 
 ### Key Results
-- Reduced infrastructure provisioning time by ~90% with automated Terraform workflows.
-- Managed deployment across 20+ Proxmox VMs and 2 Azure environments (dev/prod).
+- Provisioning Time: Reduced VM deployment time from 90+ minutes to under 10 minutes.
+- Scale: Manages the complete lifecycle of 20+ Proxmox VMs.
+- Cloud Integration: Establishes a foundational hybrid-cloud model with Azure for secure remote state management.
 - Implemented secretless CI/CD, securing 100% of credential handling with Vault and OIDC.
 
 ---
