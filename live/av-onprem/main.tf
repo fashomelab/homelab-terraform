@@ -1,20 +1,26 @@
-# /labsterraform/environments/fashomelab/main.tf
+# Description: Main Terraform configuration file for deploying Proxmox VMs
+#  using data from a YAML file and secrets from HashiCorp Vault.
 
 # 1. Fetch all required secrets from HashiCorp Vault.
 # ----------------------------------------------------
 data "vault_kv_secret_v2" "proxmox_creds" {
   mount = "kv"
-  name  = "fashomelab/proxmox-credentials"
+  name  = "apexvirtual/proxmox-credentials"
 }
 
 data "vault_kv_secret_v2" "proxmox_nodes" {
   mount = "kv"
-  name  = "fashomelab/proxmox-config"
+  name  = "apexvirtual/proxmox-config"
 }
 
 data "vault_kv_secret_v2" "ssh_keys" {
   mount = "kv"
-  name  = "fashomelab/ssh-keys"
+  name  = "apexvirtual/ssh-keys"
+}
+
+data "vault_kv_secret_v2" "common_tags" {
+  mount = "kv"
+  name  = "apexvirtual/terraform-config/common-tags"
 }
 
 # 2. Load the VM definitions from the local YAML file.
@@ -49,7 +55,7 @@ module "vmprox" {
   guestagent = each.value.guestagent
   bridge     = each.value.bridge
   vlanid     = each.value.vlanid
-  tags       = sort(concat(var.common_tags, each.value.tags))
+  tags       = sort(concat(jsondecode(data.vault_kv_secret_v2.common_tags.data["common_tags"]), try(each.value.tags, [])))
 
   # Values from Vault data sources
   virtual_environment_endpoint = data.vault_kv_secret_v2.proxmox_creds.data["PROXMOX_VIRTUAL_ENVIRONMENT_ENDPOINT"]

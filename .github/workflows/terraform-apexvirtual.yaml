@@ -1,0 +1,129 @@
+name: Terraform CI - apexvirtual
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'live/av-onprem/**'
+      - 'modules/**'
+      - '.tflint.hcl'
+      - '.github/workflows/terraform-apexvirtual.yaml'
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - 'live/av-onprem/**'
+      - 'modules/**'
+      - '.tflint.hcl'
+      - '.github/workflows/terraform-apexvirtual.yaml'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  validate-and-plan:
+    environment: av-onprem-prod
+    runs-on: arc-runner-set
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./live/av-onprem
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Clear TruffleHog Image Cache
+      run: |
+        docker rmi ghcr.io/trufflesecurity/trufflehog:3.90.6 || true
+        docker rmi ghcr.io/trufflesecurity/trufflehog:latest || true
+
+    - name: Run TruffleHog Secrets Scan
+      uses: trufflesecurity/trufflehog@v3.90.6
+      with:
+        path: .
+        extra_args: --only-verified
+      continue-on-error: false
+
+    - name: Install TFLint
+      run: |
+        curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+        tflint --version
+
+    - name: Run TFLint
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        tflint --init --config=${{ github.workspace }}/labsterraform/.tflint.hcl
+        tflint --config=${{ github.workspace }}/labsterraform/.tflint.hcl
+
+    - name: Import Secrets from HashiCorp Vault
+      uses: hashicorp/vault-action@v3
+      with:
+        url: ${{ secrets.VAULT_ADDR }}
+        role: apexvirtual-terraform-role
+        method: jwt
+        jwtGithubAudience: ${{ secrets.VAULT_ADDR }}
+        secrets: |
+          kv/data/azhomelab-prod/azure-credentials ARM_CLIENT_ID | ARM_CLIENT_ID;
+          kv/data/azhomelab-prod/azure-credentials ARM_TENANT_ID | ARM_TENANT_ID;
+          kv/data/azhomelab-prod/azure-credentials ARM_SUBSCRIPTION_ID | ARM_SUBSCRIPTION_ID;
+          kv/data/apexvirtual/proxmox-credentials PROXMOX_API_TOKEN | TF_VAR_api_token;
+          kv/data/apexvirtual/proxmox-credentials PROXMOX_USER | TF_VAR_proxmoxuser;
+          kv/data/apexvirtual/proxmox-credentials PROXMOX_VIRTUAL_ENVIRONMENT_ENDPOINT | TF_VAR_virtual_environment_endpoint;
+          kv/data/apexvirtual/proxmox-config node_primary_name | TF_VAR_proxmox_node_primary_name;
+          kv/data/apexvirtual/proxmox-config node_primary_address | TF_VAR_proxmox_node_primary_address;
+          kv/data/apexvirtual/proxmox-config node_secondary_name | TF_VAR_proxmox_node_secondary_name;
+          kv/data/apexvirtual/proxmox-config node_secondary_address | TF_VAR_proxmox_node_secondary_address;
+          kv/data/apexvirtual/ssh-keys ci_cd_public_key | TF_VAR_ci_cd_public_key;
+          kv/data/apexvirtual/ssh-keys user_public_key | TF_VAR_user_public_key;
+          kv/data/apexvirtual/ssh-keys ci_cd_private_key | CI_CD_PRIVATE_KEY
+        exportEnv: true
+        exportToken: true
+        outputToken: false
+        tlsSkipVerify: false
+        jwtTtl: 3600
+        ignoreNotFound: false
+
+    - name: Install Azure CLI
+      run: |
+        echo "Installing Azure CLI..."
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+        az --version
+
+    - name: Azure Login using OIDC
+      uses: azure/login@v1
+      with:
+        client-id: ${{ env.ARM_CLIENT_ID }}
+        tenant-id: ${{ env.ARM_TENANT_ID }}
+        subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v5
+      with:
+        node-version: '22.16.0'
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.13.1
+
+    - name: Terraform Init
+      run: |
+        terraform init -no-color \
+          -backend-config="resource_group_name=${{ secrets.ARM_BACKEND_RG }}" \
+          -backend-config="storage_account_name=${{ secrets.ARM_BACKEND_STORAGE_ACCOUNT }}" \
+          -backend-config="container_name=${{ secrets.ARM_BACKEND_CONTAINER }}" \
+          -backend-config="key=${{ secrets.ARM_BACKEND_KEY }}"
+
+    - name: Terraform Format Check
+      run: terraform fmt -check -no-color
+
+    - name: Terraform Validate
+      run: terraform validate -no-color
+
+    - name: Terraform Plan
+      run: terraform plan -no-color -out=tfplan

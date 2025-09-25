@@ -17,10 +17,7 @@ terraform {
   }
 }
 
-provider "vault" {
-  address = "https://vault.local.doubledawnfas.com"
-  # Token will be read from VAULT_TOKEN or ~/.vault-token
-}
+provider "vault" {}
 
 provider "proxmox" {
   endpoint  = data.vault_kv_secret_v2.proxmox_creds.data["PROXMOX_VIRTUAL_ENVIRONMENT_ENDPOINT"]

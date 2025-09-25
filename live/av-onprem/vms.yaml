@@ -1,0 +1,62 @@
+# ------------------------------------------------------------------------------------
+# This file defines the inventory for the "Apex Virtual" showcase project.
+# The CI/CD pipeline runs 'terraform plan' against this file to validate the code,
+# but 'terraform apply' is never run. These VMs are not physically created.
+# ------------------------------------------------------------------------------------
+
+# --- Apex Virtual Kubernetes Cluster ---
+av-k8s-control-01:
+  vm_id: 9000
+  node_name: "pve-node-01"
+  core_count: 2
+  memory: 4096
+  datastore: "shared-storage-fast"
+  guestagent: "true"
+  bridge: "vmbr1"
+  vlanid: 20 # Production VLAN
+  tags: ["k8s", "control-plane"]
+
+av-k8s-worker-01:
+  vm_id: 9001
+  node_name: "pve-node-01"
+  core_count: 4
+  memory: 8192
+  datastore: "shared-storage-fast"
+  guestagent: "true"
+  bridge: "vmbr1"
+  vlanid: 20 # Production VLAN
+  tags: ["k8s", "worker"]
+
+av-k8s-worker-02:
+  vm_id: 9002
+  node_name: "pve-node-02"
+  core_count: 4
+  memory: 8192
+  datastore: "shared-storage-fast"
+  guestagent: "true"
+  bridge: "vmbr1"
+  vlanid: 20 # Production VLAN
+  tags: ["k8s", "worker"]
+
+# --- Apex Virtual Support Services ---
+av-utility-01:
+  vm_id: 9100
+  node_name: "pve-node-01"
+  core_count: 2
+  memory: 2048
+  datastore: "local-lvm"
+  guestagent: "true"
+  bridge: "vmbr0"
+  vlanid: 10 # Management VLAN
+  tags: ["utility", "monitoring-agent"]
+
+av-ingress-proxy-01:
+  vm_id: 9200
+  node_name: "pve-node-02"
+  core_count: 2
+  memory: 2048
+  datastore: "local-lvm"
+  guestagent: "true"
+  bridge: "vmbr0"
+  vlanid: 30 # DMZ VLAN
+  tags: ["proxy", "nginx"]
