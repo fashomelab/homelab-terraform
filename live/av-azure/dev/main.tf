@@ -34,7 +34,7 @@ data "vault_kv_secret_v2" "ssh_keys" {
 # 2. Create the foundational Resource Group
 # ---------------------------------------
 module "resourcegroup" {
-  source              = "../../../modules/resourcegroup"
+  source              = "../../../modules/azure-rg"
   resource_group_name = var.resource_group_name
   location            = var.location
   tags                = var.common_tags
@@ -52,7 +52,7 @@ module "private_dns_zone" {
 # 4. Create the core networking
 # -----------------------------
 module "networking" {
-  source                        = "../../../modules/networking"
+  source                        = "../../../modules/azure-networking"
   resource_group_name           = module.resourcegroup.resource_group_name
   location                      = module.resourcegroup.location
   virtual_network_name          = var.virtual_network_name
@@ -118,10 +118,10 @@ module "database" {
   db_admin_password             = data.vault_kv_secret_v2.azure_credentials.data["db_admin_password"]
 }
 
-# 8. Create the storage account
+# 8. Create the azure storage account
 # -----------------------------
 module "storage" {
-  source                 = "../../../modules/storage"
+  source                 = "../../../modules/azure-storage"
   resource_group_name    = module.resourcegroup.resource_group_name
   location               = module.resourcegroup.location
   storage_account_name   = var.storage_account_name

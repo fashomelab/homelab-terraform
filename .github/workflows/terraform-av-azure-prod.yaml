@@ -1,19 +1,11 @@
-name: Terraform CI - ApexVirtual Prod
+name: Terraform CI - ApexVirtual Azure Prod
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'live/apexvirtual/prod/**'
-      - 'modules/**'
-      - '.tflint.hcl'
-      - '.github/workflows/terraform-av-azure-prod.yaml'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'live/apexvirtual/prod/**'
+      - 'live/av-azure/prod/**'
       - 'modules/**'
       - '.tflint.hcl'
       - '.github/workflows/terraform-av-azure-prod.yaml'

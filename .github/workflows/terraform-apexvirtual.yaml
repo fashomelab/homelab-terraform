@@ -1,9 +1,10 @@
-name: Terraform CI - ApexVirtual
+name: Terraform CI - ApexVirtual OnPrem
 
 on:
   push:
     branches:
       - develop
+      - main
     paths:
       - 'live/av-onprem/**'
       - 'modules/**'
@@ -11,7 +12,7 @@ on:
       - '.github/workflows/terraform-apexvirtual.yaml'
   pull_request:
     branches:
-      - main
+      - develop
     paths:
       - 'live/av-onprem/**'
       - 'modules/**'
@@ -23,6 +24,7 @@ on:
         description: 'The environment to deploy to'
         required: true
         default: 'av-onprem-prod'
+
 permissions:
   id-token: write
   contents: read

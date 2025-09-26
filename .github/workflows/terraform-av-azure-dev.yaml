@@ -1,19 +1,19 @@
-name: Terraform CI - ApexVirtual Dev
+name: Terraform CI - ApexVirtual Azure Dev
 
 on:
   push:
     branches:
-      - main
+      - develop
     paths:
-      - 'live/apexvirtual/dev/**'
+      - 'live/av-azure/dev/**'
       - 'modules/**'
       - '.tflint.hcl'
       - '.github/workflows/terraform-av-azure-dev.yaml'
   pull_request:
     branches:
-      - main
+      - develop
     paths:
-      - 'live/apexvirtual/dev/**'
+      - 'live/av-azure/dev/**'
       - 'modules/**'
       - '.tflint.hcl'
       - '.github/workflows/terraform-av-azure-dev.yaml'
