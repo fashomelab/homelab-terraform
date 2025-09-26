@@ -18,17 +18,17 @@ locals {
 # ---------------------------
 data "vault_kv_secret_v2" "azure_credentials" {
   mount = "kv"
-  name  = "azhomelab-dev/azure-credentials"
+  name  = "apexvirtual-azure-dev/azure-credentials"
 }
 
 data "vault_kv_secret_v2" "azure_config" {
   mount = "kv"
-  name  = "azhomelab-dev/azure-config"
+  name  = "apexvirtual-azure-dev/azure-config"
 }
 
 data "vault_kv_secret_v2" "ssh_keys" {
   mount = "kv"
-  name  = "azhomelab-dev/ssh-keys"
+  name  = "apexvirtual-azure-dev/ssh-keys"
 }
 
 # 2. Create the foundational Resource Group
@@ -73,7 +73,7 @@ module "web_vm" {
   image_offer          = var.image_offer
   image_sku            = var.image_sku
   image_version        = var.image_version
-  subnet_id            = module.networking.subnet_ids_by_name["azhomelab-frontend"]
+  subnet_id            = module.networking.subnet_ids_by_name["av-dev-frontend"]
   admin_username       = data.vault_kv_secret_v2.azure_credentials.data["admin_username"]
   admin_ssh_key_public = data.vault_kv_secret_v2.ssh_keys.data["user_public_key"]
   create_public_ip     = var.create_public_ip
@@ -92,7 +92,7 @@ module "app_vm" {
   image_offer          = var.image_offer
   image_sku            = var.image_sku
   image_version        = var.image_version
-  subnet_id            = module.networking.subnet_ids_by_name["azhomelab-backend"]
+  subnet_id            = module.networking.subnet_ids_by_name["av-dev-backend"]
   admin_username       = data.vault_kv_secret_v2.azure_credentials.data["admin_username"]
   admin_ssh_key_public = data.vault_kv_secret_v2.ssh_keys.data["user_public_key"]
   create_public_ip     = false
@@ -110,7 +110,7 @@ module "database" {
   db_storage_mb                 = var.db_storage_mb
   public_network_access_enabled = var.public_network_access_enabled
   tags                          = var.common_tags
-  subnet_id                     = module.networking.subnet_ids_by_name["database-subnet"]
+  subnet_id                     = module.networking.subnet_ids_by_name["av-dev-database"]
   private_dns_zone_name         = var.private_dns_zone_name
   private_dns_zone_id           = module.private_dns_zone.id
   virtual_network_id            = module.networking.virtual_network_id
@@ -128,8 +128,8 @@ module "storage" {
   network_rules_ip_rules = [data.vault_kv_secret_v2.azure_config.data["network_rules_ip_rules"]]
   container_names        = var.container_names
   virtual_network_subnet_ids = [
-    module.networking.subnet_ids_by_name["azhomelab-frontend"],
-    module.networking.subnet_ids_by_name["azhomelab-backend"]
+    module.networking.subnet_ids_by_name["av-dev-frontend"],
+    module.networking.subnet_ids_by_name["av-dev-backend"]
   ]
   tags = var.common_tags
 }
