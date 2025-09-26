@@ -77,6 +77,7 @@ jobs:
         url: ${{ secrets.VAULT_ADDR }}
         role: apexvirtual-terraform-role
         method: jwt
+        jwtGithubAudience: https://token.actions.githubusercontent.com
         secrets: |
           kv/data/apexvirtual-azure-prod/azure-credentials ARM_CLIENT_ID | ARM_CLIENT_ID;
           kv/data/apexvirtual-azure-prod/azure-credentials ARM_TENANT_ID | ARM_TENANT_ID;
