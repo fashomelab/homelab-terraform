@@ -1,4 +1,4 @@
-name: Terraform CI - apexvirtual
+name: Terraform CI - ApexVirtual
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
       - '.github/workflows/terraform-apexvirtual.yaml'
   pull_request:
     branches:
-      - develop
+      - main
     paths:
       - 'live/av-onprem/**'
       - 'modules/**'
@@ -26,10 +26,16 @@ jobs:
   validate-and-plan:
     environment: av-onprem-prod
     runs-on: arc-runner-set
+    env:
+      VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+      ARM_BACKEND_CONTAINER: ${{ secrets.ARM_BACKEND_CONTAINER }}
+      ARM_BACKEND_KEY: ${{ secrets.ARM_BACKEND_KEY }}
+      ARM_USE_OIDC: true
     defaults:
       run:
         shell: bash
         working-directory: ./live/av-onprem
+    
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -57,8 +63,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        tflint --init --config=${{ github.workspace }}/labsterraform/.tflint.hcl
-        tflint --config=${{ github.workspace }}/labsterraform/.tflint.hcl
+        tflint --init --config=${{ github.workspace }}/.tflint.hcl
+        tflint --config=${{ github.workspace }}/.tflint.hcl
 
     - name: Import Secrets from HashiCorp Vault
       uses: hashicorp/vault-action@v3
@@ -66,11 +72,10 @@ jobs:
         url: ${{ secrets.VAULT_ADDR }}
         role: apexvirtual-terraform-role
         method: jwt
-        jwtGithubAudience: ${{ secrets.VAULT_ADDR }}
         secrets: |
-          kv/data/azhomelab-prod/azure-credentials ARM_CLIENT_ID | ARM_CLIENT_ID;
-          kv/data/azhomelab-prod/azure-credentials ARM_TENANT_ID | ARM_TENANT_ID;
-          kv/data/azhomelab-prod/azure-credentials ARM_SUBSCRIPTION_ID | ARM_SUBSCRIPTION_ID;
+          kv/data/apexvirtual-azure-prod/azure-credentials ARM_CLIENT_ID | ARM_CLIENT_ID;
+          kv/data/apexvirtual-azure-prod/azure-credentials ARM_TENANT_ID | ARM_TENANT_ID;
+          kv/data/apexvirtual-azure-prod/azure-credentials ARM_SUBSCRIPTION_ID | ARM_SUBSCRIPTION_ID;
           kv/data/apexvirtual/proxmox-credentials PROXMOX_API_TOKEN | TF_VAR_api_token;
           kv/data/apexvirtual/proxmox-credentials PROXMOX_USER | TF_VAR_proxmoxuser;
           kv/data/apexvirtual/proxmox-credentials PROXMOX_VIRTUAL_ENVIRONMENT_ENDPOINT | TF_VAR_virtual_environment_endpoint;
@@ -116,8 +121,8 @@ jobs:
         terraform init -no-color \
           -backend-config="resource_group_name=${{ secrets.ARM_BACKEND_RG }}" \
           -backend-config="storage_account_name=${{ secrets.ARM_BACKEND_STORAGE_ACCOUNT }}" \
-          -backend-config="container_name=${{ secrets.ARM_BACKEND_CONTAINER }}" \
-          -backend-config="key=${{ secrets.ARM_BACKEND_KEY }}"
+          -backend-config="container_name=${{ env.ARM_BACKEND_CONTAINER }}" \
+          -backend-config="key=${{ env.ARM_BACKEND_KEY }}"
 
     - name: Terraform Format Check
       run: terraform fmt -check -no-color
