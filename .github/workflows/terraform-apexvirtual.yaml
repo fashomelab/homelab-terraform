@@ -123,6 +123,8 @@ jobs:
         terraform_version: 1.13.1
 
     - name: Terraform Init
+      env:
+        VAULT_TOKEN: ${{ env.VAULT_TOKEN }}
       run: |
         terraform init -no-color \
           -backend-config="resource_group_name=${{ secrets.ARM_BACKEND_RG }}" \

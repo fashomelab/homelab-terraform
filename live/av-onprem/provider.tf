@@ -17,7 +17,9 @@ terraform {
   }
 }
 
-provider "vault" {}
+provider "vault" {
+  skip_child_token = true
+}
 
 provider "proxmox" {
   endpoint  = data.vault_kv_secret_v2.proxmox_creds.data["PROXMOX_VIRTUAL_ENVIRONMENT_ENDPOINT"]
