@@ -8,7 +8,7 @@ on:
       - 'live/apexvirtual/prod/**'
       - 'modules/**'
       - '.tflint.hcl'
-      - '.github/workflows/terraform-apexvirtual-prod.yaml'
+      - '.github/workflows/terraform-av-azure-prod.yaml'
   pull_request:
     branches:
       - main
@@ -16,7 +16,7 @@ on:
       - 'live/apexvirtual/prod/**'
       - 'modules/**'
       - '.tflint.hcl'
-      - '.github/workflows/terraform-apexvirtual-prod.yaml'
+      - '.github/workflows/terraform-av-azure-prod.yaml'
 
 permissions:
   id-token: write
@@ -74,14 +74,14 @@ jobs:
         method: jwt
         jwtGithubAudience: ${{ secrets.VAULT_ADDR }}
         secrets: |
-          kv/data/apexvirtual-prod/azure-credentials ARM_CLIENT_ID | ARM_CLIENT_ID;
-          kv/data/apexvirtual-prod/azure-credentials ARM_TENANT_ID | ARM_TENANT_ID;
-          kv/data/apexvirtual-prod/azure-credentials ARM_SUBSCRIPTION_ID | ARM_SUBSCRIPTION_ID;
-          kv/data/apexvirtual-prod/azure-credentials db_admin_password | TF_VAR_db_admin_password;
-          kv/data/apexvirtual-prod/azure-credentials db_admin_login | TF_VAR_db_admin_login;
-          kv/data/apexvirtual-prod/azure-credentials admin_username | TF_VAR_admin_username;
-          kv/data/apexvirtual-prod/ssh-keys user_public_key | TF_VAR_user_public_key;
-          kv/data/apexvirtual-prod/azure-config network_rules_ip_rules | TF_VAR_network_rules_ip_rules
+          kv/data/apexvirtual-azure-prod/azure-credentials ARM_CLIENT_ID | ARM_CLIENT_ID;
+          kv/data/apexvirtual-azure-prod/azure-credentials ARM_TENANT_ID | ARM_TENANT_ID;
+          kv/data/apexvirtual-azure-prod/azure-credentials ARM_SUBSCRIPTION_ID | ARM_SUBSCRIPTION_ID;
+          kv/data/apexvirtual-azure-prod/azure-credentials db_admin_password | TF_VAR_db_admin_password;
+          kv/data/apexvirtual-azure-prod/azure-credentials db_admin_login | TF_VAR_db_admin_login;
+          kv/data/apexvirtual-azure-prod/azure-credentials admin_username | TF_VAR_admin_username;
+          kv/data/apexvirtual-azure-prod/ssh-keys user_public_key | TF_VAR_user_public_key;
+          kv/data/apexvirtual-azure-prod/azure-config network_rules_ip_rules | TF_VAR_network_rules_ip_rules
         exportEnv: true
         exportToken: true
         outputToken: false

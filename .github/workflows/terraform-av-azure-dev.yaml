@@ -1,17 +1,22 @@
-name: Terraform CI - Azhomelab Dev
+name: Terraform CI - ApexVirtual Dev
 
 on:
   push:
     branches:
-      - develop
-  pull_request:
-    branches:
-      - develop  # Add this
+      - main
     paths:
-      - 'live/azhomelab/dev/**'
+      - 'live/apexvirtual/dev/**'
       - 'modules/**'
       - '.tflint.hcl'
-      - '.github/workflows/terraform-azhomelab-dev.yaml'
+      - '.github/workflows/terraform-av-azure-dev.yaml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'live/apexvirtual/dev/**'
+      - 'modules/**'
+      - '.tflint.hcl'
+      - '.github/workflows/terraform-av-azure-dev.yaml'
 
 permissions:
   id-token: write
@@ -19,7 +24,7 @@ permissions:
 
 jobs:
   validate-and-plan:
-    environment: azhomelab-dev
+    environment: av-azure-dev
     env:
       VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
       ARM_BACKEND_CONTAINER: ${{ secrets.ARM_BACKEND_CONTAINER }}
@@ -29,8 +34,8 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./live/azhomelab/dev
-
+        working-directory: ./live/av-azure/dev
+    
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -65,18 +70,18 @@ jobs:
       uses: hashicorp/vault-action@v3
       with:
         url: ${{ secrets.VAULT_ADDR }}
-        role: fashomelab-terraform-role
+        role: apexvirtual-terraform-role
         method: jwt
         jwtGithubAudience: ${{ secrets.VAULT_ADDR }}
         secrets: |
-          kv/data/azhomelab-dev/azure-credentials ARM_CLIENT_ID | ARM_CLIENT_ID;
-          kv/data/azhomelab-dev/azure-credentials ARM_TENANT_ID | ARM_TENANT_ID;
-          kv/data/azhomelab-dev/azure-credentials ARM_SUBSCRIPTION_ID | ARM_SUBSCRIPTION_ID;
-          kv/data/azhomelab-dev/azure-credentials db_admin_password | TF_VAR_db_admin_password;
-          kv/data/azhomelab-dev/azure-credentials db_admin_login | TF_VAR_db_admin_login;
-          kv/data/azhomelab-dev/azure-credentials admin_username | TF_VAR_admin_username;
-          kv/data/azhomelab-dev/ssh-keys user_public_key | TF_VAR_user_public_key;
-          kv/data/azhomelab-dev/azure-config network_rules_ip_rules | TF_VAR_network_rules_ip_rules
+          kv/data/apexvirtual-azure-dev/azure-credentials ARM_CLIENT_ID | ARM_CLIENT_ID;
+          kv/data/apexvirtual-azure-dev/azure-credentials ARM_TENANT_ID | ARM_TENANT_ID;
+          kv/data/apexvirtual-azure-dev/azure-credentials ARM_SUBSCRIPTION_ID | ARM_SUBSCRIPTION_ID;
+          kv/data/apexvirtual-azure-dev/azure-credentials db_admin_password | TF_VAR_db_admin_password;
+          kv/data/apexvirtual-azure-dev/azure-credentials db_admin_login | TF_VAR_db_admin_login;
+          kv/data/apexvirtual-azure-dev/azure-credentials admin_username | TF_VAR_admin_username;
+          kv/data/apexvirtual-azure-dev/ssh-keys user_public_key | TF_VAR_user_public_key;
+          kv/data/apexvirtual-azure-dev/azure-config network_rules_ip_rules | TF_VAR_network_rules_ip_rules
         exportEnv: true
         exportToken: true
         outputToken: false
@@ -85,8 +90,6 @@ jobs:
         ignoreNotFound: false
 
     - name: Install Azure CLI
-      env:
-        VAULT_TOKEN: ${{ env.VAULT_TOKEN }}
       run: |
         echo "Installing Azure CLI..."
         curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
@@ -110,6 +113,8 @@ jobs:
         terraform_version: 1.13.1
 
     - name: Terraform Init
+      env:
+        VAULT_TOKEN: ${{ env.VAULT_TOKEN }}
       run: |
         terraform init -no-color \
           -backend-config="resource_group_name=${{ secrets.ARM_BACKEND_RG }}" \
@@ -124,4 +129,4 @@ jobs:
       run: terraform validate -no-color
 
     - name: Terraform Plan
-      run: terraform plan -no-color -out=tfplan -var-file="dev.tfvars"
+      run: terraform plan -no-color -out=tfplan -var-file="prod.tfvars"
