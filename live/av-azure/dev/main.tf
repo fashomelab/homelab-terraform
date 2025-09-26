@@ -1,4 +1,6 @@
-# labsterraform/environments/azhomelab/dev/main.tf
+# live/av-azure/dev/main.tf
+# Main Terraform configuration for the AV Azure Dev environment.
+# This file orchestrates the creation of all resources using modules and variables.
 
 locals {
   # Standardize inputs to ensure consistent formatting.

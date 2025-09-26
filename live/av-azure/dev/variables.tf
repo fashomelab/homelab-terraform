@@ -1,4 +1,4 @@
-# labsterraform/environments/azhomelab/dev/variables.tf
+# live/av-azure/dev/variables.tf
 
 variable "company_abbr" {
   description = "A short (3-6 character) abbreviation for the company or project."

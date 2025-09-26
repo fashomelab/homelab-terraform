@@ -1,4 +1,4 @@
-# labsterraform/environments/azhomelab/prod/prod.tfvars
+# live/av-azure/dev/dev.tfvars.example
 
 # --- Naming Convention Components ---
 company_abbr = "azlab"

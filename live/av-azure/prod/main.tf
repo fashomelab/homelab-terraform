@@ -1,4 +1,6 @@
-# labsterraform/environments/azhomelab/prod/main.tf
+# live/av-azure/prod/main.tf
+# Main Terraform configuration for the AV Azure Dev environment.
+# This file orchestrates the creation of all resources using modules and variables.
 
 locals {
   # Standardize inputs to ensure consistent formatting.
@@ -32,7 +34,7 @@ data "vault_kv_secret_v2" "ssh_keys" {
 # 2. Create the foundational Resource Group
 # ---------------------------------------
 module "resourcegroup" {
-  source              = "../../../modules/resourcegroup"
+  source              = "../../../modules/azure-rg"
   resource_group_name = var.resource_group_name
   location            = var.location
   tags                = var.common_tags
@@ -50,7 +52,7 @@ module "private_dns_zone" {
 # 4. Create the core networking
 # -----------------------------
 module "networking" {
-  source                        = "../../../modules/networking"
+  source                        = "../../../modules/azure-networking"
   resource_group_name           = module.resourcegroup.resource_group_name
   location                      = module.resourcegroup.location
   virtual_network_name          = var.virtual_network_name
@@ -119,7 +121,7 @@ module "database" {
 # 8. Create the storage account
 # -----------------------------
 module "storage" {
-  source                 = "../../../modules/storage"
+  source                 = "../../../modules/azure-storage"
   resource_group_name    = module.resourcegroup.resource_group_name
   location               = module.resourcegroup.location
   storage_account_name   = var.storage_account_name

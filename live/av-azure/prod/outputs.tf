@@ -1,4 +1,4 @@
-# /environments/azhomelab/prod/outputs.tf
+# live/av-azure/prod/outputs.tf
 
 output "virtual_machine_details" {
   description = "Details of the deployed virtual machines."

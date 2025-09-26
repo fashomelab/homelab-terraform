@@ -1,4 +1,4 @@
-# labsterraform/environments/azhomelab/prod/prod.tfvars
+# live/av-azure/prod/prod.tfvars.example
 
 #
 # Template for configuring the production environment in Azure.

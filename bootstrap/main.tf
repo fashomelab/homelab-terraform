@@ -1,4 +1,4 @@
-# /bootstrap/main.tf
+# bootstrap/main.tf
 #
 # This configuration bootstraps the foundational Azure infrastructure required for
 # the Terraform remote backend. It creates a Resource Group and a globally unique

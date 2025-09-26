@@ -1,4 +1,5 @@
-# labsterraform/environments/azhomelab/prod/provider.tf
+# live/av-azure/dev/provider.tf
+
 terraform {
   required_version = ">= 1.13.1"
 
@@ -19,7 +20,7 @@ terraform {
 }
 
 provider "vault" {
-  address = "https://vault.local.doubledawnfas.com"
+  skip_child_token = true
 }
 
 provider "azurerm" {

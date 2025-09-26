@@ -1,4 +1,4 @@
-# labsterraform/environments/fashomelab/outputs.tf
+# live/av-onprem/outputs.tf
 
 output "virtual_machine_details" {
   description = "Details of the deployed Proxmox virtual machines."
