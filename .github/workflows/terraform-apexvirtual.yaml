@@ -17,7 +17,12 @@ on:
       - 'modules/**'
       - '.tflint.hcl'
       - '.github/workflows/terraform-apexvirtual.yaml'
-
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'The environment to deploy to'
+        required: true
+        default: 'av-onprem-prod'
 permissions:
   id-token: write
   contents: read
