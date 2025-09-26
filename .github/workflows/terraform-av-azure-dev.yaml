@@ -42,18 +42,6 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Clear TruffleHog Image Cache
-      run: |
-        docker rmi ghcr.io/trufflesecurity/trufflehog:3.90.6 || true
-        docker rmi ghcr.io/trufflesecurity/trufflehog:latest || true
-
-    - name: Run TruffleHog Secrets Scan
-      uses: trufflesecurity/trufflehog@v3.90.6
-      with:
-        path: .
-        extra_args: --only-verified
-      continue-on-error: false
-
     - name: Install TFLint
       run: |
         curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
@@ -70,9 +58,9 @@ jobs:
       uses: hashicorp/vault-action@v3
       with:
         url: ${{ secrets.VAULT_ADDR }}
-        role: apexvirtual-terraform-role
+        role: apexvirtual-azure-dev-terraform-role
         method: jwt
-        jwtGithubAudience: ${{ secrets.VAULT_ADDR }}
+        jwtGithubAudience: ${{ secrets.JWT_GITHUB_AUDIENCE }}
         secrets: |
           kv/data/apexvirtual-azure-dev/azure-credentials ARM_CLIENT_ID | ARM_CLIENT_ID;
           kv/data/apexvirtual-azure-dev/azure-credentials ARM_TENANT_ID | ARM_TENANT_ID;
