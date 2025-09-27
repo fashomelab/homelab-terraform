@@ -28,7 +28,7 @@ terraform.rc
 # -----------------------------------------------------------------------------
 # Ignore all .tfvars files as they contain environment-specific values or secrets.
 # Common practice is to use a .tfvars.example or similar file as a template.
-*.tfvars
+#*.tfvars
 *.tfvars.json
 *.tfvars.bak
 
