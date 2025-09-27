@@ -117,4 +117,4 @@ jobs:
       run: terraform validate -no-color
 
     - name: Terraform Plan
-      run: terraform plan -no-color -out=tfplan -var-file="prod.tfvars"
+      run: terraform plan -no-color -out=tfplan -var-file="dev.tfvars"
