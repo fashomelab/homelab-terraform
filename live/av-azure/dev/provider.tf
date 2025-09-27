@@ -20,7 +20,7 @@ terraform {
 }
 
 provider "vault" {
-  skip_child_token = ture
+  skip_child_token = true
 }
 
 provider "azurerm" {

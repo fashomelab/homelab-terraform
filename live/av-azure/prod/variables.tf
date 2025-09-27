@@ -1,11 +1,11 @@
 # live/av-azure/prod/variables.tf
 
 variable "company_abbr" {
-  description = "A short (3-6 character) abbreviation for the company or project."
+  description = "A short (2-6 character) abbreviation for the company or project."
   type        = string
   validation {
-    condition     = can(regex("^[a-z0-9]{3,6}$", var.company_abbr))
-    error_message = "The company_abbr must be 3 to 6 characters long and contain only lowercase letters and numbers."
+    condition     = can(regex("^[a-z0-9]{2,6}$", var.company_abbr))
+    error_message = "The company_abbr must be 2 to 6 characters long and contain only lowercase letters and numbers."
   }
 }
 

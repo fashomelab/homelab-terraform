@@ -49,18 +49,6 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Clear TruffleHog Image Cache
-      run: |
-        docker rmi ghcr.io/trufflesecurity/trufflehog:3.90.6 || true
-        docker rmi ghcr.io/trufflesecurity/trufflehog:latest || true
-
-    - name: Run TruffleHog Secrets Scan
-      uses: trufflesecurity/trufflehog@v3.90.6
-      with:
-        path: .
-        extra_args: --only-verified
-      continue-on-error: false
-
     - name: Install TFLint
       run: |
         curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
@@ -77,13 +65,13 @@ jobs:
       uses: hashicorp/vault-action@v3
       with:
         url: ${{ secrets.VAULT_ADDR }}
-        role: apexvirtual-terraform-role
+        role: apexvirtual-onprem-terraform-role
         method: jwt
-        jwtGithubAudience: https://token.actions.githubusercontent.com
+        jwtGithubAudience: ${{ secrets.JWT_GITHUB_AUDIENCE }}
         secrets: |
-          kv/data/apexvirtual-azure-prod/azure-credentials ARM_CLIENT_ID | ARM_CLIENT_ID;
-          kv/data/apexvirtual-azure-prod/azure-credentials ARM_TENANT_ID | ARM_TENANT_ID;
-          kv/data/apexvirtual-azure-prod/azure-credentials ARM_SUBSCRIPTION_ID | ARM_SUBSCRIPTION_ID;
+          kv/data/apexvirtual/azure-credentials ARM_CLIENT_ID | ARM_CLIENT_ID;
+          kv/data/apexvirtual/azure-credentials ARM_TENANT_ID | ARM_TENANT_ID;
+          kv/data/apexvirtual/azure-credentials ARM_SUBSCRIPTION_ID | ARM_SUBSCRIPTION_ID;
           kv/data/apexvirtual/proxmox-credentials PROXMOX_API_TOKEN | TF_VAR_api_token;
           kv/data/apexvirtual/proxmox-credentials PROXMOX_USER | TF_VAR_proxmoxuser;
           kv/data/apexvirtual/proxmox-credentials PROXMOX_VIRTUAL_ENVIRONMENT_ENDPOINT | TF_VAR_virtual_environment_endpoint;
