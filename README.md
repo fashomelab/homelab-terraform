@@ -1,129 +1,149 @@
-# Homelab Infrastructure as Code (Terraform)
+# ApexVirtual - Terraform Infrastructure Platform
 
-<div align="center">
-  <img src="https://img.shields.io/badge/Proxmox-CI%20Passing-brightgreen" alt="FasHomeLab CI">
-  <img src="https://img.shields.io/badge/Azure%20Prod-CI%20Passing-brightgreen" alt="AzHomelab Prod CI">
-  <img src="https://img.shields.io/badge/Azure%20Dev-CI%20Passing-brightgreen" alt="AzHomelab Dev CI">
-</div>
+[![Terraform](https://img.shields.io/badge/Terraform-1.13+-7c3aed?logo=terraform&logoColor=white)](https://terraform.io)
+[![Azure](https://img.shields.io/badge/Azure-Cloud-0078d4?logo=microsoftazure&logoColor=white)](https://azure.microsoft.com)
+[![Proxmox](https://img.shields.io/badge/Proxmox-VE-e57000?logo=proxmox&logoColor=white)](https://proxmox.com)
+[![Vault](https://img.shields.io/badge/HashiCorp-Vault-000000?logo=vault&logoColor=white)](https://vaultproject.io)
 
-This repository powers the infrastructure layer of my [FasHomeLab project](https://github.com/fashomelab/corneb), a hybrid homelab inspired by the automation of Horizon’s Faro Automated Solutions. What began as a single Proxmox server has grown into a fully declarative setup managing VMs on Proxmox and resources in Azure. This is my DevOps sandbox, where I experiment with Terraform to build scalable, secure infrastructure—paired with my [Ansible repo](https://github.com/fashomelab/ansible) for configuration.
-
----
-
-## 🌟 Why This Repo?
-
-I got tired of manually spinning up VMs and Azure resources, so I turned to Terraform to make my homelab infrastructure repeatable and version-controlled. This repo automates provisioning for my Proxmox cluster and Azure environments, saving me hours of setup time and ensuring consistency. It’s a core part of my [FasHomeLab portfolio](https://github.com/fashomelab/corneb), showcasing IaC skills in a real-world setup. Want to build your own hybrid-cloud lab? Fork this, tweak the vars, and deploy your infrastructure!
+**Production-grade Terraform code for the ApexVirtual Platform - a hybrid cloud environment showcasing enterprise Platform Engineering patterns.**
 
 ---
 
-## 🚀 Key Features
+## Key Results & Impact
 
-- **Hybrid-Cloud Management**: Provisions resources across on-premise Proxmox (`fashomelab`) and Azure (`azhomelab/dev`, `azhomelab/prod`) environments.
-- **Modular Design**: Uses reusable modules (e.g., VMs, databases) for maintainability and scalability.
-- **Secure Remote Backend**: Bootstraps an Azure Storage Account for safe Terraform state storage.
-- **Automated CI/CD**: Validates changes via GitHub Actions with separate pipelines for Proxmox, Azure Dev, and Azure Prod.
-- **Secretless Workflow**: Leverages OIDC and HashiCorp Vault for dynamic, secure credential management in CI/CD.
+This infrastructure codebase delivers measurable business value through automation and modern practices:
 
-### Key Results
-- Provisioning Time: Reduced VM deployment time from 90+ minutes to under 10 minutes.
-- Scale: Manages the complete lifecycle of 20+ Proxmox VMs.
-- Cloud Integration: Establishes a foundational hybrid-cloud model with Azure for secure remote state management.
-- Implemented secretless CI/CD, securing 100% of credential handling with Vault and OIDC.
+- **90% Faster Provisioning** - Reduced environment deployment from 90+ minutes to under 10 minutes
+- **100% Secretless CI/CD** - Eliminated static credentials using GitHub OIDC and HashiCorp Vault
+- **Multi-Environment Consistency** - Manages 20+ VMs across hybrid cloud with zero configuration drift
+- **Enterprise Security** - Implements network segmentation, secrets management, and least-privilege access
 
 ---
-## 🏗️ Repository Structure
 
-The repository is organized into `bootstrap`, `environments`, and `modules` to create a clear, scalable, and professional workflow.
+## Repository Structure
 
-<pre>
-.
-├── .github/workflows/
-│   ├── terraform-azhomelab-dev.yaml   # CI pipeline for Azure Dev
-│   ├── terraform-azhomelab-prod.yaml  # CI pipeline for Azure Prod
-│   └── terraform-fashomelab.yaml    # CI pipeline for Proxmox
-├── bootstrap/                     # Initial setup for the Azure backend
-└── labsterraform/
-    ├── environments/
-    │   ├── azhomelab/
-    │   │   ├── dev/                 # Root configuration for Azure Dev
-    │   │   └── prod/                # Root configuration for Azure Prod
-    │   └── fashomelab/              # Root configuration for Proxmox
-    └── modules/
-        ├── azure-database/          # Reusable module for Azure PostgreSQL
-        ├── azure-vm-linux/          # Reusable module for Azure Linux VMs
-        └── ... and other modules
-</pre>
+Professional multi-environment layout separating configuration from reusable infrastructure components:
 
-* **`/bootstrap`**: A standalone Terraform configuration to create the foundational Azure resources (Resource Group, Storage Account) needed for the remote state backend. This is the first thing you run.
-* **`/labsterraform/environments`**: Contains the root configurations for each distinct environment. This is where you run `terraform plan` and `apply` for day-to-day operations. Each environment is completely isolated.
-* **`/labsterraform/modules`**: Contains reusable, generic building blocks (like creating a VM or a database) that are called by the environment configurations.
+```
+apexvirtual-terraform/
+├── .github/workflows/           # Environment-specific CI/CD pipelines
+│   ├── terraform-av-onprem.yaml    # On-premises Proxmox infrastructure
+│   ├── terraform-av-azure-dev.yaml # Azure development environment  
+│   └── terraform-av-azure-prod.yaml# Azure production environment
+├── bootstrap/                   # One-time Azure backend setup
+├── live/                       # Environment configurations
+│   ├── av-onprem/              # On-premises Proxmox platform (20+ VMs)
+│   └── av-azure/               # Azure cloud environments
+│       ├── dev/                # Development: 3-tier web application
+│       └── prod/               # Production: HA configuration
+└── modules/                    # Reusable infrastructure components
+    ├── azure-rg/               # Resource group management
+    ├── azure-networking/       # VNet, subnets, private DNS
+    ├── azure-vm-linux/         # Linux virtual machines
+    ├── azure-database/         # PostgreSQL flexible servers
+    └── azure-storage/          # Storage accounts and containers
+```
 
 ---
-## ⚙️ Automation & CI/CD Workflow
 
-A multi-workflow CI/CD pipeline automatically validates all infrastructure changes. This setup is a best practice for managing a complex monorepo with separate environments.
+## Platform Engineering Capabilities
 
-- **Dynamic Secrets Management**: Leverages OIDC and HashiCorp Vault for secure, temporary credential generation, eliminating static secrets.
+### Security Architecture
+- **Zero-Trust Networking**: Private subnets, VLAN segmentation, and security groups
+- **Secrets Management**: HashiCorp Vault with environment-specific policies and OIDC integration
+- **Least-Privilege Access**: Separate Vault roles for each environment (dev/prod/onprem)
+- **Network Segmentation**: VLANs 283/284/285 for proper traffic isolation
 
-<div align="center">
-  <img src="images/management-workflow-vault-oidc.png" alt="Secretless Authentication Using OIDC and HashiCorp Vault" width="600">
-  <p><em>Secretless Authentication Using OIDC and HashiCorp Vault.</em></p>
-</div>
+### CI/CD & GitOps
+- **Branch-based Workflows**: Environment-specific deployment pipelines
+- **Automated Validation**: Security scanning, linting, and infrastructure testing
+- **Remote State Management**: Azure backend with state locking and encryption
+- **Multi-Environment Support**: Isolated pipelines for dev, prod, and on-premises
 
-### Multi-Workflow Strategy
-
-To ensure efficiency and isolation, three separate, path-based GitHub Actions workflows are used:
-* **`terraform-fashomelab.yaml`**: Triggers on changes to the on-premise `fashomelab` environment.
-* **`terraform-azhomelab-dev.yaml`**: Triggers on pushes to the `develop` branch to provide continuous validation of the `dev` environment.
-* **`terraform-azhomelab-prod.yaml`**: Triggers on pull requests to the `main` branch, acting as a production gatekeeper.
-
-<div align="center">
-  <img src="images/cicd-pipeline-flowchart.png" alt="CI/CD Pipeline for Automated Terraform Validation Across Environments" width="600">
-  <p><em>CI/CD Pipeline for Automated Terraform Validation Across Environments.</em></p>
-</div>
-
-### The CI Pipeline Process
-
-On every relevant event, the correct workflow performs the following steps on a self-hosted runner:
-
-1.  **Scan for Secrets:** Runs TruffleHog to ensure no sensitive credentials have been accidentally committed.
-2.  **Lint Code:** Uses TFLint to check the code against Azure and Terraform best practices.
-3.  **Authenticate Securely:** Connects to HashiCorp Vault using a JWT/OIDC role to get a short-lived token.
-4.  **Initialize & Validate:** Runs `terraform init` to configure the Azure remote backend and `terraform validate` to check for syntax errors.
-5.  **Create Plan:** Runs `terraform plan` to generate an execution plan for review.
-
-This ensures that no code is merged without being automatically checked for quality, security, and correctness against the existing infrastructure state.
----
-## 🚀 Getting Started
-
-This repository can be used to manage your own hybrid infrastructure.
-
-### 1. Bootstrap the Backend
-
-The first step is to create the secure Azure Storage Account for your Terraform state.
-
-1.  Navigate to the `bootstrap` directory.
-2.  Copy `bootstrap.tfvars.example` to `bootstrap.tfvars` and fill in your details.
-3.  Run the following commands:
-    ```bash
-    terraform init
-    terraform apply
-    ```
-4.  Note the output names (like the storage account and resource group). You'll need these for your environment configurations.
-
-### 2. Configure an Environment
-
-Next, configure one of the main environments (e.g., `azhomelab/prod`).
-
-1.  Navigate to the environment directory (e.g., `/labsterraform/environments/azhomelab/prod`).
-2.  Update the `backend.tf` file with the resource names from the bootstrap step.
-3.  Create a `.tfvars` file (e.g., `prod.tfvars`) from the provided `.tfvars.example` and populate it with your desired infrastructure settings.
-4.  Run `terraform plan` and `terraform apply`.
+### Infrastructure Patterns
+- **Modular Design**: Reusable modules following DRY principles
+- **Environment Isolation**: Separate configurations with consistent patterns
+- **Hybrid Cloud**: Seamless management across Proxmox and Azure platforms
+- **High Availability**: Multi-node clusters and redundant configurations
 
 ---
-## 🤝 Contributing
-Contributions are welcome! Fork the repo, customize modules or vars, or submit PRs to enhance Proxmox/Azure support. Check issues for ideas.
+
+## Infrastructure Provisioned
+
+### On-Premises Platform (av-onprem)
+- **20+ Virtual Machines**: Configured for Kubernetes masters, workers, and infrastructure services
+- **Network Infrastructure**: Multi-VLAN setup (283/284/285) with proper security segmentation
+- **Storage Systems**: VM disk allocation across multiple Proxmox datastores
+- **Compute Resources**: CPU and memory allocation optimized per workload type
+
+### Azure Cloud Environments
+- **Development (av-azure-dev)**: Virtual machines, VNet, subnets, and PostgreSQL database
+- **Production (av-azure-prod)**: HA virtual machines with load balancer and managed database
+- **Shared Infrastructure**: Resource groups, storage accounts, private DNS zones, and networking
 
 ---
-## 📜 License
-This project is licensed under the MIT License. See the [LICENSE.md](LICENSE.md) file for details.
+
+## Technology Stack
+
+**Infrastructure as Code**: Terraform with modular design patterns  
+**Secrets Management**: HashiCorp Vault with OIDC authentication  
+**Cloud Platforms**: Microsoft Azure + Proxmox VE hybrid architecture  
+**CI/CD**: GitHub Actions with environment-specific workflows  
+**Security**: Pre-commit hooks, TruffleHog scanning, and network segmentation
+
+---
+
+## Getting Started
+
+### Prerequisites
+- Terraform 1.13+
+- Azure CLI with appropriate permissions
+- Access to Proxmox cluster and HashiCorp Vault
+
+### Quick Start
+
+**1. Bootstrap Azure Backend**
+```bash
+cd bootstrap/
+terraform init && terraform apply
+```
+
+**2. Deploy Environment**
+```bash
+cd live/av-azure/dev/
+terraform init && terraform plan && terraform apply
+```
+
+**3. Verify Deployment**
+```bash
+terraform output  # Check infrastructure status
+az vm list --resource-group apexvirtual-resources-dev
+```
+
+---
+
+## Professional Context
+
+This platform demonstrates key Platform Engineering competencies:
+
+**Infrastructure as Code**: Advanced Terraform patterns with modules, remote state, and multi-environment management
+
+**Security Engineering**: Zero-trust architecture, secrets management, and secure CI/CD implementation
+
+**Cloud Architecture**: Hybrid cloud design with network segmentation and high-availability patterns
+
+**DevOps Practices**: GitOps workflows, automated testing, and comprehensive monitoring
+
+---
+
+## Portfolio Links
+
+**Main Platform Overview**: [ApexVirtual Platform](https://github.com/fashomelab/corneb) - Complete platform architecture and application deployment
+
+**Configuration Management**: [Ansible Automation](https://github.com/fashomelab/homelab-ansible) - Server configuration and application setup
+
+**Available for Platform Engineering roles** - Remote/Hybrid (Portsmouth UK area)
+
+---
+
+*Infrastructure code powering the ApexVirtual platform - designed to showcase production-ready Platform Engineering practices through practical implementation of enterprise architecture patterns.*
