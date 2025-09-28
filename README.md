@@ -60,11 +60,12 @@ apexvirtual-terraform/
 - **Remote State Management**: Azure backend with state locking and encryption
 - **Multi-Environment Support**: Isolated pipelines for dev, prod, and on-premises
 
-![High-Level Architecture Workflow](images/cicd-pipeline-flowchart.png)
 
 <details>
   <summary>Click to view the detailed workflow logic and triggers</summary>
-  
+
+![High-Level Architecture Workflow](images/cicd-pipeline-flowchart.png)
+
   ### Deployment Flow
   
   **Developer Push → GitHub Event → Workflow Selection → Authentication → Validation → Planning**
