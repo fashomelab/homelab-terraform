@@ -60,6 +60,26 @@ apexvirtual-terraform/
 - **Remote State Management**: Azure backend with state locking and encryption
 - **Multi-Environment Support**: Isolated pipelines for dev, prod, and on-premises
 
+![High-Level Architecture Workflow](images/cicd-pipeline-flowchart.png)
+
+<details>
+  <summary>Click to view the detailed workflow logic and triggers</summary>
+  
+  ### Deployment Flow
+  
+  **Developer Push → GitHub Event → Workflow Selection → Authentication → Validation → Planning**
+  
+  Code commit → Branch trigger → Environment-specific → Vault OIDC → TFLint → Terraform Plan
+  
+  *The pre-commit hook runs a TruffleHog scan locally before the push is ever made.*
+
+  ### Workflow Triggers
+  - **av-azure-dev:** Triggers on push to `develop` and pull requests targeting `develop`.
+  - **av-azure-prod:** Triggers only on push to `main` for production safety.
+  - **av-onprem:** Triggers on push to `develop` and `main`, and on pull requests targeting `develop`.
+
+</details>
+
 ### Infrastructure Patterns
 - **Modular Design**: Reusable modules following DRY principles
 - **Environment Isolation**: Separate configurations with consistent patterns
