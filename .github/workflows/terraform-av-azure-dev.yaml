@@ -1,0 +1,58 @@
+name: Terraform CI - ApexVirtual Azure Dev
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'live/av-azure/dev/**'
+      - 'modules/**'
+      - '.tflint.hcl'
+      - '.github/workflows/terraform-av-azure-dev.yaml'
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - 'live/av-azure/dev/**'
+      - 'modules/**'
+      - '.tflint.hcl'
+      - '.github/workflows/terraform-av-azure-dev.yaml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./live/av-azure/dev
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.13.1
+
+    - name: Install TFLint
+      run: |
+        curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+        tflint --version
+
+    - name: Run TFLint
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        tflint --init --config=${{ github.workspace }}/.tflint.hcl
+        tflint --config=${{ github.workspace }}/.tflint.hcl
+
+    - name: Terraform Format Check
+      run: terraform fmt -check -recursive -no-color
+
+    - name: Terraform Validate (without backend)
+      run: terraform validate -no-color
+      continue-on-error: true
