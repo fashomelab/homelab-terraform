@@ -5,6 +5,12 @@
 [![Proxmox](https://img.shields.io/badge/Proxmox-VE-e57000?logo=proxmox&logoColor=white)](https://proxmox.com)
 [![Vault](https://img.shields.io/badge/HashiCorp-Vault-000000?logo=vault&logoColor=white)](https://vaultproject.io)
 
+<div align="center">
+  <img src="https://github.com/fashomelab/apexvirtual-terraform/actions/workflows/terraform-apexvirtual.yaml/badge.svg" alt="On-Prem CI Status">
+  <img src="https://github.com/fashomelab/apexvirtual-terraform/actions/workflows/terraform-av-azure-dev.yaml/badge.svg" alt="Azure Dev CI Status">
+  <img src="https://github.com/fashomelab/apexvirtual-terraform/actions/workflows/terraform-av-azure-prod.yaml/badge.svg" alt="Azure Prod CI Status">
+</div>
+
 **Production-grade Terraform code for the ApexVirtual Platform - a hybrid-cloud environment showcasing enterprise Platform Engineering patterns.**
 
 ---
