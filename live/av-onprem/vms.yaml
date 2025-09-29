@@ -1,0 +1,363 @@
+# live/av-onprem/vms.yaml
+#
+# ApexVirtual Infrastructure Inventory
+
+# Defines virtual machines for multi-cluster Platform Engineering environment
+# Architecture: Development → Production → Infrastructure service clusters
+# Network: Segmented VLANs for security and traffic isolation
+
+# =============================================================================
+# DEVELOPMENT KUBERNETES CLUSTER (av-dev-k8s)
+# Purpose: Development workloads, CI/CD testing, feature validation
+# Network: VLAN 284 (Development Network)
+# =============================================================================
+
+av-dev-master-01:
+  vm_id: 9000
+  node_name: "pve-node-01"
+  core_count: 6
+  memory: 6144
+  datastore: "nvme-fast"
+  guestagent: "true"
+  bridge: "vmbr0"
+  vlanid: 284
+  tags: ["k8s-dev", "master", "control-plane"]
+  description: "Development cluster control plane - Rancher/K3s"
+
+av-dev-worker-01:
+  vm_id: 9001
+  node_name: "pve-node-02"
+  core_count: 6
+  memory: 3072
+  datastore: "ssd-storage"
+  guestagent: "true"
+  bridge: "vmbr0"
+  vlanid: 284
+  tags: ["k8s-dev", "worker"]
+  description: "Development cluster worker node"
+
+av-dev-worker-02:
+  vm_id: 9002
+  node_name: "pve-node-03"
+  core_count: 6
+  memory: 3072
+  datastore: "ssd-storage"
+  guestagent: "true"
+  bridge: "vmbr0"
+  vlanid: 284
+  tags: ["k8s-dev", "worker"]
+  description: "Development cluster worker node"
+
+# =============================================================================
+# PRODUCTION KUBERNETES CLUSTER (av-prod-k8s)
+# Purpose: Production workloads, customer-facing applications
+# Network: VLAN 283 (Production/Infrastructure Network)
+# Architecture: HA control plane with 3 masters, dedicated workers
+# Note: Production and infrastructure services share VLAN 283 by design -
+#       monitoring, GitOps, and logging services require production access
+# Future: Consider microsegmentation with Kubernetes NetworkPolicies
+# =============================================================================
+
+av-prod-master-01:
+  vm_id: 9010
+  node_name: "pve-node-01"
+  core_count: 4
+  memory: 4096
+  datastore: "ssd-storage"
+  guestagent: "true"
+  bridge: "vmbr1"
+  vlanid: 283
+  tags: ["k8s-prod", "master", "control-plane", "ha"]
+  description: "Production HA control plane node 1"
+
+av-prod-master-02:
+  vm_id: 9011
+  node_name: "pve-node-02"
+  core_count: 4
+  memory: 4096
+  datastore: "ssd-storage"
+  guestagent: "true"
+  bridge: "vmbr1"
+  vlanid: 283
+  tags: ["k8s-prod", "master", "control-plane", "ha"]
+  description: "Production HA control plane node 2"
+
+av-prod-master-03:
+  vm_id: 9012
+  node_name: "pve-node-03"
+  core_count: 4
+  memory: 4096
+  datastore: "nvme-fast"
+  guestagent: "true"
+  bridge: "vmbr1"
+  vlanid: 283
+  tags: ["k8s-prod", "master", "control-plane", "ha"]
+  description: "Production HA control plane node 3"
+
+av-prod-worker-01:
+  vm_id: 9013
+  node_name: "pve-node-01"
+  core_count: 4
+  memory: 4096
+  datastore: "ssd-storage"
+  guestagent: "true"
+  bridge: "vmbr1"
+  vlanid: 283
+  tags: ["k8s-prod", "worker", "compute"]
+  description: "Production worker node - compute intensive workloads"
+
+av-prod-worker-02:
+  vm_id: 9014
+  node_name: "pve-node-02"
+  core_count: 4
+  memory: 4096
+  datastore: "ssd-storage"
+  guestagent: "true"
+  bridge: "vmbr1"
+  vlanid: 283
+  tags: ["k8s-prod", "worker", "compute"]
+  description: "Production worker node - compute intensive workloads"
+
+av-prod-worker-03:
+  vm_id: 9015
+  node_name: "pve-node-03"
+  core_count: 4
+  memory: 4096
+  datastore: "nvme-fast"
+  guestagent: "true"
+  bridge: "vmbr1"
+  vlanid: 283
+  tags: ["k8s-prod", "worker", "compute"]
+  description: "Production worker node - compute intensive workloads"
+
+# =============================================================================
+# INFRASTRUCTURE SERVICES CLUSTER (av-infra-k8s)
+# Purpose: Platform services, monitoring, logging, GitOps controllers
+# Network: VLAN 283 (Production/Infrastructure Network)
+# Services: ArgoCD, Prometheus, Grafana, FluxCD, etc.
+# Rationale: Platform services require production access for monitoring/GitOps
+# =============================================================================
+
+av-infra-master-01:
+  vm_id: 9020
+  node_name: "pve-node-01"
+  core_count: 4
+  memory: 4096
+  datastore: "ssd-storage"
+  guestagent: "true"
+  bridge: "vmbr1"
+  vlanid: 283
+  tags: ["k8s-infra", "master", "platform-services"]
+  description: "Infrastructure cluster - GitOps and monitoring services"
+
+av-infra-worker-01:
+  vm_id: 9021
+  node_name: "pve-node-02"
+  core_count: 4
+  memory: 4096
+  datastore: "ssd-storage"
+  guestagent: "true"
+  bridge: "vmbr1"
+  vlanid: 283
+  tags: ["k8s-infra", "worker", "platform-services"]
+  description: "Infrastructure services worker node"
+
+av-infra-worker-02:
+  vm_id: 9022
+  node_name: "pve-node-03"
+  core_count: 4
+  memory: 4096
+  datastore: "ssd-storage"
+  guestagent: "true"
+  bridge: "vmbr1"
+  vlanid: 283
+  tags: ["k8s-infra", "worker", "platform-services"]
+  description: "Infrastructure services worker node"
+
+# =============================================================================
+# SECURITY & SECRETS MANAGEMENT
+# Purpose: HashiCorp Vault cluster for secrets management
+# Network: VLAN 283 (Secure Infrastructure Network)
+# Architecture: HA Vault cluster with integrated storage
+# =============================================================================
+
+av-vault-01:
+  vm_id: 9100
+  node_name: "pve-node-01"
+  core_count: 2
+  memory: 2048
+  datastore: "ssd-storage"
+  guestagent: "true"
+  bridge: "vmbr1"
+  vlanid: 283
+  tags: ["vault", "security", "secrets-management", "ha"]
+  description: "HashiCorp Vault primary node - secrets management"
+
+av-vault-02:
+  vm_id: 9101
+  node_name: "pve-node-02"
+  core_count: 2
+  memory: 2048
+  datastore: "ssd-storage"
+  guestagent: "true"
+  bridge: "vmbr1"
+  vlanid: 283
+  tags: ["vault", "security", "secrets-management", "ha"]
+  description: "HashiCorp Vault secondary node - HA cluster member"
+
+av-vault-03:
+  vm_id: 9102
+  node_name: "pve-node-03"
+  core_count: 2
+  memory: 2048
+  datastore: "ssd-storage"
+  guestagent: "true"
+  bridge: "vmbr1"
+  vlanid: 283
+  tags: ["vault", "security", "secrets-management", "ha"]
+  description: "HashiCorp Vault tertiary node - HA cluster member"
+
+# =============================================================================
+# NETWORKING & LOAD BALANCING
+# Purpose: Ingress controllers, reverse proxy, TLS termination
+# Network: VLAN 285 (DMZ/Edge Network)
+# =============================================================================
+
+av-nginx-proxy-01:
+  vm_id: 9200
+  node_name: "pve-node-01"
+  core_count: 2
+  memory: 2048
+  datastore: "ssd-storage"
+  guestagent: "true"
+  bridge: "vmbr0"
+  vlanid: 285
+  tags: ["reverse-proxy", "ingress", "nginx", "tls-termination"]
+  description: "NGINX reverse proxy - external traffic ingress"
+
+av-nginx-proxy-02:
+  vm_id: 9201
+  node_name: "pve-node-02"
+  core_count: 2
+  memory: 2048
+  datastore: "ssd-storage"
+  guestagent: "true"
+  bridge: "vmbr0"
+  vlanid: 285
+  tags: ["reverse-proxy", "ingress", "nginx", "tls-termination", "ha"]
+  description: "NGINX reverse proxy - HA failover node"
+
+# =============================================================================
+# OBSERVABILITY & LOGGING STACK
+# Purpose: Centralized logging, metrics collection, alerting
+# Network: VLAN 283 (Infrastructure Network)
+# Stack: Elasticsearch, Logstash, Kibana (ELK)
+# =============================================================================
+
+av-elasticsearch-01:
+  vm_id: 9300
+  node_name: "pve-node-01"
+  core_count: 4
+  memory: 4096
+  datastore: "ssd-storage"
+  guestagent: "true"
+  bridge: "vmbr0"
+  vlanid: 283
+  tags: ["elasticsearch", "logging", "search", "observability"]
+  description: "Elasticsearch node 1 - distributed search and analytics"
+
+av-elasticsearch-02:
+  vm_id: 9301
+  node_name: "pve-node-02"
+  core_count: 4
+  memory: 4096
+  datastore: "ssd-storage"
+  guestagent: "true"
+  bridge: "vmbr0"
+  vlanid: 283
+  tags: ["elasticsearch", "logging", "search", "observability"]
+  description: "Elasticsearch node 2 - distributed search and analytics"
+
+av-elasticsearch-03:
+  vm_id: 9302
+  node_name: "pve-node-03"
+  core_count: 4
+  memory: 4096
+  datastore: "ssd-storage"
+  guestagent: "true"
+  bridge: "vmbr0"
+  vlanid: 283
+  tags: ["elasticsearch", "logging", "search", "observability"]
+  description: "Elasticsearch node 3 - distributed search and analytics"
+
+av-kibana-01:
+  vm_id: 9303
+  node_name: "pve-node-01"
+  core_count: 2
+  memory: 4096
+  datastore: "ssd-storage"
+  guestagent: "true"
+  bridge: "vmbr0"
+  vlanid: 283
+  tags: ["kibana", "logging", "visualization", "observability"]
+  description: "Kibana dashboard - log visualization and analysis"
+
+# =============================================================================
+# CONTAINER PLATFORM SERVICES
+# Purpose: Docker registry, CI/CD services, build agents
+# Network: VLAN 283 (Infrastructure Network)
+# =============================================================================
+
+av-docker-registry-01:
+  vm_id: 9400
+  node_name: "pve-node-02"
+  core_count: 2
+  memory: 4096
+  datastore: "ssd-storage"
+  guestagent: "true"
+  bridge: "vmbr0"
+  vlanid: 283
+  tags: ["docker", "registry", "artifacts", "ci-cd"]
+  description: "Private Docker registry - container image storage"
+
+av-build-agent-01:
+  vm_id: 9401
+  node_name: "pve-node-03"
+  core_count: 4
+  memory: 8192
+  datastore: "nvme-fast"
+  guestagent: "true"
+  bridge: "vmbr0"
+  vlanid: 283
+  tags: ["ci-cd", "build-agent", "docker", "azure-devops"]
+  description: "Azure DevOps build agent - CI/CD pipeline execution"
+
+# =============================================================================
+# STORAGE & BACKUP SERVICES
+# Purpose: NFS storage, backup targets, disaster recovery
+# Network: VLAN 283 (Infrastructure Network)
+# =============================================================================
+
+av-nfs-storage-01:
+  vm_id: 9500
+  node_name: "pve-node-01"
+  core_count: 2
+  memory: 2048
+  datastore: "hdd-bulk"
+  guestagent: "true"
+  bridge: "vmbr1"
+  vlanid: 283
+  tags: ["nfs", "storage", "persistent-volumes", "k8s-storage"]
+  description: "NFS server - Kubernetes persistent volume storage"
+
+av-backup-target-01:
+  vm_id: 9501
+  node_name: "pve-node-02"
+  core_count: 1
+  memory: 1024
+  datastore: "hdd-bulk"
+  guestagent: "true"
+  bridge: "vmbr1"
+  vlanid: 283
+  tags: ["backup", "disaster-recovery", "restic", "long-term-storage"]
+  description: "Backup target server - automated backup destination"
