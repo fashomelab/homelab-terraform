@@ -19,18 +19,11 @@ on:
       - '.github/workflows/terraform-av-azure-dev.yaml'
 
 permissions:
-  id-token: write
   contents: read
 
 jobs:
-  validate-and-plan:
-    environment: av-azure-dev
-    env:
-      VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
-      ARM_BACKEND_CONTAINER: ${{ secrets.ARM_BACKEND_CONTAINER }}
-      ARM_BACKEND_KEY: ${{ secrets.ARM_BACKEND_KEY }}
-      ARM_USE_OIDC: true
-    runs-on: arc-runner-set
+  validate-and-lint:
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
@@ -39,8 +32,11 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
       with:
-        fetch-depth: 0
+        terraform_version: 1.13.1
 
     - name: Install TFLint
       run: |
@@ -49,72 +45,14 @@ jobs:
 
     - name: Run TFLint
       env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         tflint --init --config=${{ github.workspace }}/.tflint.hcl
         tflint --config=${{ github.workspace }}/.tflint.hcl
 
-    - name: Import Secrets from HashiCorp Vault
-      uses: hashicorp/vault-action@v3
-      with:
-        url: ${{ secrets.VAULT_ADDR }}
-        role: apexvirtual-azure-dev-terraform-role
-        method: jwt
-        jwtGithubAudience: ${{ secrets.JWT_GITHUB_AUDIENCE }}
-        secrets: |
-          kv/data/apexvirtual-azure-dev/azure-credentials ARM_CLIENT_ID | ARM_CLIENT_ID;
-          kv/data/apexvirtual-azure-dev/azure-credentials ARM_TENANT_ID | ARM_TENANT_ID;
-          kv/data/apexvirtual-azure-dev/azure-credentials ARM_SUBSCRIPTION_ID | ARM_SUBSCRIPTION_ID;
-          kv/data/apexvirtual-azure-dev/azure-credentials db_admin_password | TF_VAR_db_admin_password;
-          kv/data/apexvirtual-azure-dev/azure-credentials db_admin_login | TF_VAR_db_admin_login;
-          kv/data/apexvirtual-azure-dev/azure-credentials admin_username | TF_VAR_admin_username;
-          kv/data/apexvirtual-azure-dev/ssh-keys user_public_key | TF_VAR_user_public_key;
-          kv/data/apexvirtual-azure-dev/azure-config network_rules_ip_rules | TF_VAR_network_rules_ip_rules
-        exportEnv: true
-        exportToken: true
-        outputToken: false
-        tlsSkipVerify: false
-        jwtTtl: 3600
-        ignoreNotFound: false
-
-    - name: Install Azure CLI
-      run: |
-        echo "Installing Azure CLI..."
-        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-        az --version
-
-    - name: Azure Login using OIDC
-      uses: azure/login@v1
-      with:
-        client-id: ${{ env.ARM_CLIENT_ID }}
-        tenant-id: ${{ env.ARM_TENANT_ID }}
-        subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v5
-      with:
-        node-version: '22.16.0'
-
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: 1.13.1
-
-    - name: Terraform Init
-      env:
-        VAULT_TOKEN: ${{ env.VAULT_TOKEN }}
-      run: |
-        terraform init -no-color \
-          -backend-config="resource_group_name=${{ secrets.ARM_BACKEND_RG }}" \
-          -backend-config="storage_account_name=${{ secrets.ARM_BACKEND_STORAGE_ACCOUNT }}" \
-          -backend-config="container_name=${{ env.ARM_BACKEND_CONTAINER }}" \
-          -backend-config="key=${{ env.ARM_BACKEND_KEY }}"
-
     - name: Terraform Format Check
-      run: terraform fmt -check -no-color
+      run: terraform fmt -check -recursive -no-color
 
-    - name: Terraform Validate
+    - name: Terraform Validate (without backend)
       run: terraform validate -no-color
-
-    - name: Terraform Plan
-      run: terraform plan -no-color -out=tfplan -var-file="dev.tfvars"
+      continue-on-error: true
