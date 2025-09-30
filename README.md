@@ -150,10 +150,7 @@ This platform demonstrates key Platform Engineering competencies:
 ## Portfolio Links
 
 **Main Platform Overview**: [ApexVirtual Platform](https://github.com/fashomelab/corneb) - Complete platform architecture and application deployment
-
 **Configuration Management**: [Ansible Automation](https://github.com/fashomelab/homelab-ansible) - Server configuration and application setup
-
-**Available for Platform Engineering roles** - Remote/Hybrid (Portsmouth UK area)
 
 ---
 
